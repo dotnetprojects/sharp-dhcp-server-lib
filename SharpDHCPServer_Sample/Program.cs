@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
-using Cluster.SharpDHCPServer;
+using DotNetProjects.DhcpServer;
 
 namespace Cluster.SharpDHCPServer_Sample
 {
