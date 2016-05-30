@@ -161,6 +161,8 @@ namespace DotNetProjects.DhcpServer
         StaticRoutes = 121,
         /// <summary>Option 249</summary>
         StaticRoutesWin = 249,
+        /// <summary>Option 252</summary>
+        Wpad = 252,
         /// <summary>Option 255 (END option)</summary>
         END_Option = 255
     }
