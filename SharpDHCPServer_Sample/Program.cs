@@ -37,6 +37,7 @@ namespace Cluster.SharpDHCPServer_Sample
             var server = new DHCPServer();
             server.ServerName = "SharpDHCPServer";
             server.OnDataReceived += Request;
+            server.Start();
             Console.WriteLine("Running DHCP server. Press enter to stop it.");
             Console.ReadLine();
             server.Dispose();
@@ -50,7 +51,7 @@ namespace Cluster.SharpDHCPServer_Sample
             IPAddress ip;
             if (!leases.TryGetValue(mac, out ip))
             {
-                ip = new IPAddress(new byte[] { 10, 0, 0, nextIP++ });
+                ip = new IPAddress(new byte[] { 192, 168, 1, nextIP++ });
                 leases[mac] = ip;
             }
             Console.WriteLine(type.ToString() + " request from " + mac + ", it will be " + ip.ToString());

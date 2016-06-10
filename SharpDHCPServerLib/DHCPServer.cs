@@ -32,6 +32,9 @@ namespace DotNetProjects.DhcpServer
         private Socket socket = null;
         private Thread receiveDataThread = null;
         private const int PORT_TO_LISTEN_TO = 67;
+        private IPAddress _bindIp;
+
+        public event Action<Exception> UnhandledException;
 
         /// <summary>
         /// Creates DHCP server, it will be started instantly
@@ -39,16 +42,21 @@ namespace DotNetProjects.DhcpServer
         /// <param name="bindIp">IP address to bind</param>
         public DHCPServer(IPAddress bindIp)
         {
-            var ipLocalEndPoint = new IPEndPoint(bindIp, PORT_TO_LISTEN_TO);
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.Bind(ipLocalEndPoint);
-            receiveDataThread = new Thread(ReceiveDataThread);
-            receiveDataThread.Start();
+            _bindIp = bindIp;
         }
 
         /// <summary>Creates DHCP server, it will be started instantly</summary>
         public DHCPServer() : this(IPAddress.Any)
         {
+        }
+
+        public void Start()
+        {
+            var ipLocalEndPoint = new IPEndPoint(_bindIp, PORT_TO_LISTEN_TO);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.Bind(ipLocalEndPoint);
+            receiveDataThread = new Thread(ReceiveDataThread);
+            receiveDataThread.Start();
         }
 
         /// <summary>Disposes DHCP server</summary>
@@ -82,9 +90,10 @@ namespace DotNetProjects.DhcpServer
                         dataReceivedThread.Start(buffer);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Ignore all
+                    if (UnhandledException != null)
+                        UnhandledException(ex);
                 }
             }
         }
@@ -124,9 +133,10 @@ namespace DotNetProjects.DhcpServer
                     //    break;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Ignore
+                if (UnhandledException != null)
+                    UnhandledException(ex);
             }
         }
     }
