@@ -263,15 +263,17 @@ namespace DotNetProjects.DhcpServer
                     (replyBuffer.giaddr[2] == 0) && (replyBuffer.giaddr[3] == 0))
                 {
                     requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-                    endPoint = new IPEndPoint(IPAddress.Broadcast, PORT_TO_SEND_TO_CLIENT);
+                    endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
                 }
                 else
                 {
                     requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
                     endPoint = new IPEndPoint(new IPAddress(replyBuffer.giaddr), PORT_TO_SEND_TO_RELAY);
                 }
+
                 var DataToSend = BuildDataStructure(replyBuffer);
                 requestSocket.SendTo(DataToSend, endPoint);
+
             }
         }
 

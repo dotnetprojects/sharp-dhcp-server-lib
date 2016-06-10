@@ -36,6 +36,8 @@ namespace DotNetProjects.DhcpServer
 
         public event Action<Exception> UnhandledException;
 
+        public IPAddress BroadcastAddress { get; set; }
+
         /// <summary>
         /// Creates DHCP server, it will be started instantly
         /// </summary>
@@ -48,6 +50,7 @@ namespace DotNetProjects.DhcpServer
         /// <summary>Creates DHCP server, it will be started instantly</summary>
         public DHCPServer() : this(IPAddress.Any)
         {
+            BroadcastAddress = IPAddress.Broadcast;
         }
 
         public void Start()
