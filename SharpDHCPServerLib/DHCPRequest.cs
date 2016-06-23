@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -95,8 +96,10 @@ namespace DotNetProjects.DhcpServer
             return optList.ToArray();
         }
 
-        private byte[] CreateOptionStruct(DHCPMsgType msgType, DHCPReplyOptions replyOptions, Dictionary<DHCPOption, byte[]> otherForceOptions)
+        private byte[] CreateOptionStruct(DHCPMsgType msgType, DHCPReplyOptions replyOptions, Dictionary<DHCPOption, byte[]> otherForceOptions, IEnumerable<DHCPOption> forceOptions)
         {
+            Dictionary<DHCPOption, byte[]> options = new Dictionary<DHCPOption, byte[]>();
+
             byte[] resultOptions = null;
             // Requested options
             var reqList = GetRequestedOptionsList();
@@ -105,11 +108,14 @@ namespace DotNetProjects.DhcpServer
             CreateOptionElement(ref resultOptions, DHCPOption.DHCPMessageTYPE, new byte[] { (byte)msgType });
             // Server identifier - our IP address
             if ((replyOptions != null) && (replyOptions.ServerIdentifier != null))
-                CreateOptionElement(ref resultOptions, DHCPOption.ServerIdentifier, replyOptions.ServerIdentifier.GetAddressBytes());
+                options.Add(DHCPOption.ServerIdentifier, replyOptions.ServerIdentifier.GetAddressBytes());
+
+            if (reqList == null && forceOptions != null)
+                reqList = new DHCPOption[0];
 
             // Requested options
             if ((reqList != null) && (replyOptions != null))
-                foreach (DHCPOption i in reqList)
+                foreach (DHCPOption i in reqList.Union(forceOptions).Distinct().OrderBy(x=>(int)x))
                 {
                     byte[] optionData = null;
                     // If it's force option - ignore it. We'll send it later.
@@ -167,7 +173,9 @@ namespace DotNetProjects.DhcpServer
                             break;
                     }
                     if (optionData != null)
-                        CreateOptionElement(ref resultOptions, i, optionData);
+                    {
+                        options.Add(i, optionData);
+                    }
                 }
 
             if (GetMsgType() != DHCPMsgType.DHCPINFORM)
@@ -180,30 +188,43 @@ namespace DotNetProjects.DhcpServer
                     leaseTime[2] = (byte)(replyOptions.IPAddressLeaseTime >> 8);
                     leaseTime[1] = (byte)(replyOptions.IPAddressLeaseTime >> 16);
                     leaseTime[0] = (byte)(replyOptions.IPAddressLeaseTime >> 24);
-                    CreateOptionElement(ref resultOptions, DHCPOption.IPAddressLeaseTime, leaseTime);
-                    leaseTime[3] = (byte)(replyOptions.RenewalTimeValue_T1);
-                    leaseTime[2] = (byte)(replyOptions.RenewalTimeValue_T1 >> 8);
-                    leaseTime[1] = (byte)(replyOptions.RenewalTimeValue_T1 >> 16);
-                    leaseTime[0] = (byte)(replyOptions.RenewalTimeValue_T1 >> 24);
-                    CreateOptionElement(ref resultOptions, DHCPOption.RenewalTimeValue_T1, leaseTime);
-                    leaseTime[3] = (byte)(replyOptions.RebindingTimeValue_T2);
-                    leaseTime[2] = (byte)(replyOptions.RebindingTimeValue_T2 >> 8);
-                    leaseTime[1] = (byte)(replyOptions.RebindingTimeValue_T2 >> 16);
-                    leaseTime[0] = (byte)(replyOptions.RebindingTimeValue_T2 >> 24);
-                    CreateOptionElement(ref resultOptions, DHCPOption.RebindingTimeValue_T2, leaseTime);
+                    options.Add(DHCPOption.IPAddressLeaseTime, leaseTime);
+                    if (replyOptions.RenewalTimeValue_T1.HasValue)
+                    {
+                        leaseTime[3] = (byte) (replyOptions.RenewalTimeValue_T1);
+                        leaseTime[2] = (byte) (replyOptions.RenewalTimeValue_T1 >> 8);
+                        leaseTime[1] = (byte) (replyOptions.RenewalTimeValue_T1 >> 16);
+                        leaseTime[0] = (byte) (replyOptions.RenewalTimeValue_T1 >> 24);
+                        options.Add(DHCPOption.RenewalTimeValue_T1, leaseTime);
+                    }
+                    if (replyOptions.RebindingTimeValue_T2.HasValue)
+                    {
+                        leaseTime[3] = (byte) (replyOptions.RebindingTimeValue_T2);
+                        leaseTime[2] = (byte) (replyOptions.RebindingTimeValue_T2 >> 8);
+                        leaseTime[1] = (byte) (replyOptions.RebindingTimeValue_T2 >> 16);
+                        leaseTime[0] = (byte) (replyOptions.RebindingTimeValue_T2 >> 24);
+                        options.Add(DHCPOption.RebindingTimeValue_T2, leaseTime);
+                    }
                 }
             }
             // Other requested options
             if (otherForceOptions != null)
                 foreach (var option in otherForceOptions.Keys)
                 {
-                    CreateOptionElement(ref resultOptions, option, otherForceOptions[option]);
+                    options.Add(option, otherForceOptions[option]);
                     if (option == DHCPOption.RelayInfo) relayInfo = null;
                 }
 
             // Option 82? Send it back!
             if (relayInfo != null)
-                CreateOptionElement(ref resultOptions, DHCPOption.RelayInfo, relayInfo);
+            {
+                options.Add(DHCPOption.RelayInfo, relayInfo);
+            }
+
+            foreach (var option in options.OrderBy(x=>(int)x.Key))
+            {
+                CreateOptionElement(ref resultOptions, option.Key, option.Value);
+            }
 
             // Create the end option
             Array.Resize(ref resultOptions, resultOptions.Length + 1);
@@ -234,8 +255,11 @@ namespace DotNetProjects.DhcpServer
         /// <param name="replyData">Reply options (will be sent if requested)</param>
         public void SendDHCPReply(DHCPMsgType msgType, IPAddress ip, DHCPReplyOptions replyData)
         {
-            SendDHCPReply(msgType, ip, replyData, null);
+            SendDHCPReply(msgType, ip, replyData, null, null);
         }
+
+
+
         /// <summary>
         /// Sends DHCP reply
         /// </summary>
@@ -243,12 +267,42 @@ namespace DotNetProjects.DhcpServer
         /// <param name="ip">IP for client</param>
         /// <param name="replyData">Reply options (will be sent if requested)</param>
         /// <param name="otherForceOptions">Force reply options (will be sent anyway)</param>
-        public void SendDHCPReply(DHCPMsgType msgType, IPAddress ip, DHCPReplyOptions replyData, Dictionary<DHCPOption, byte[]> otherForceOptions)
+        public void SendDHCPReply(DHCPMsgType msgType, IPAddress ip, DHCPReplyOptions replyData,
+            Dictionary<DHCPOption, byte[]> otherForceOptions)
+        {
+            SendDHCPReply(msgType, ip, replyData, otherForceOptions, null);
+        }
+
+        /// <summary>
+        /// Sends DHCP reply
+        /// </summary>
+        /// <param name="msgType">Type of DHCP message to send</param>
+        /// <param name="ip">IP for client</param>
+        /// <param name="replyData">Reply options (will be sent if requested)</param>
+        /// <param name="forceOptions">Force reply options (will be sent anyway)</param>
+        public void SendDHCPReply(DHCPMsgType msgType, IPAddress ip, DHCPReplyOptions replyData,
+            IEnumerable<DHCPOption> forceOptions)
+        {
+            SendDHCPReply(msgType, ip, replyData, null, forceOptions);
+        }
+
+        /// <summary>
+        /// Sends DHCP reply
+        /// </summary>
+        /// <param name="msgType">Type of DHCP message to send</param>
+        /// <param name="ip">IP for client</param>
+        /// <param name="replyData">Reply options (will be sent if requested)</param>
+        /// <param name="otherForceOptions">Force reply options (will be sent anyway)</param>
+        private void SendDHCPReply(DHCPMsgType msgType, IPAddress ip, DHCPReplyOptions replyData, Dictionary<DHCPOption, byte[]> otherForceOptions, IEnumerable<DHCPOption> forceOptions)
         {
             var replyBuffer = requestData;
             replyBuffer.op = 2; // Reply
             replyBuffer.yiaddr = ip.GetAddressBytes(); // Client's IP
-            replyBuffer.options = CreateOptionStruct(msgType, replyData, otherForceOptions); // Options
+            if (replyData.ServerIpAddress != null)
+            {
+                replyBuffer.siaddr = replyData.ServerIpAddress.GetAddressBytes();
+            }
+            replyBuffer.options = CreateOptionStruct(msgType, replyData, otherForceOptions, forceOptions); // Options
             if (!string.IsNullOrEmpty(dhcpServer.ServerName))
             {
                 var serverNameBytes = Encoding.ASCII.GetBytes(dhcpServer.ServerName);
@@ -258,22 +312,32 @@ namespace DotNetProjects.DhcpServer
             }
             lock (requestSocket)
             {
+                var DataToSend = BuildDataStructure(replyBuffer);
+                if (DataToSend.Length < 300)
+                {
+                    var sendArray = new byte[300];
+                    Array.Copy(DataToSend, 0, sendArray, 0, DataToSend.Length);
+                    DataToSend = sendArray;
+                }
+
                 IPEndPoint endPoint;
                 if ((replyBuffer.giaddr[0] == 0) && (replyBuffer.giaddr[1] == 0) &&
                     (replyBuffer.giaddr[2] == 0) && (replyBuffer.giaddr[3] == 0))
                 {
-                    requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-                    endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
+                    //requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                    //endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
+
+                    var udp = new UdpClient();
+                    udp.EnableBroadcast = true;
+                    udp.Send(DataToSend, DataToSend.Length, new IPEndPoint(dhcpServer.BroadcastAddress, 68));
+                    udp.Close();
                 }
                 else
                 {
                     requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
                     endPoint = new IPEndPoint(new IPAddress(replyBuffer.giaddr), PORT_TO_SEND_TO_RELAY);
+                    requestSocket.SendTo(DataToSend, endPoint);
                 }
-
-                var DataToSend = BuildDataStructure(replyBuffer);
-                requestSocket.SendTo(DataToSend, endPoint);
-
             }
         }
 
@@ -340,6 +404,9 @@ namespace DotNetProjects.DhcpServer
                     dumpData = new byte[DataLength];
                     Array.Copy(requestData.options, i + 2, dumpData, 0, DataLength);
                     return dumpData;
+                }
+                else if (DDataID == 0)
+                {
                 }
                 else
                 {

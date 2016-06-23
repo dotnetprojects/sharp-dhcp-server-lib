@@ -9,12 +9,14 @@ namespace DotNetProjects.DhcpServer
     {
         /// <summary>IP address</summary>
         public IPAddress SubnetMask = null;
+        /// <summary>Next Server IP address (bootp)</summary>
+        public IPAddress ServerIpAddress = null;
         /// <summary>IP address lease time (seconds)</summary>
         public UInt32 IPAddressLeaseTime = 60 * 60 * 24;
         /// <summary>Renewal time (seconds)</summary>
-        public UInt32 RenewalTimeValue_T1 = 60 * 60 * 24;
+        public UInt32? RenewalTimeValue_T1 = 60 * 60 * 24;
         /// <summary>Rebinding time (seconds)</summary>
-        public UInt32 RebindingTimeValue_T2 = 60 * 60 * 24;
+        public UInt32? RebindingTimeValue_T2 = 60 * 60 * 24;
         /// <summary>Domain name</summary>
         public string DomainName = null;
         /// <summary>IP address of DHCP server</summary>
