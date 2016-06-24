@@ -108,7 +108,7 @@ namespace DotNetProjects.DhcpServer
             CreateOptionElement(ref resultOptions, DHCPOption.DHCPMessageTYPE, new byte[] { (byte)msgType });
             // Server identifier - our IP address
             if ((replyOptions != null) && (replyOptions.ServerIdentifier != null))
-                options.Add(DHCPOption.ServerIdentifier, replyOptions.ServerIdentifier.GetAddressBytes());
+                options[DHCPOption.ServerIdentifier] = replyOptions.ServerIdentifier.GetAddressBytes();
 
             if (reqList == null && forceOptions != null)
                 reqList = new DHCPOption[0];
@@ -174,7 +174,7 @@ namespace DotNetProjects.DhcpServer
                     }
                     if (optionData != null)
                     {
-                        options.Add(i, optionData);
+                        options[i] = optionData;
                     }
                 }
 
@@ -188,14 +188,14 @@ namespace DotNetProjects.DhcpServer
                     leaseTime[2] = (byte)(replyOptions.IPAddressLeaseTime >> 8);
                     leaseTime[1] = (byte)(replyOptions.IPAddressLeaseTime >> 16);
                     leaseTime[0] = (byte)(replyOptions.IPAddressLeaseTime >> 24);
-                    options.Add(DHCPOption.IPAddressLeaseTime, leaseTime);
+                    options[DHCPOption.IPAddressLeaseTime] = leaseTime;
                     if (replyOptions.RenewalTimeValue_T1.HasValue)
                     {
                         leaseTime[3] = (byte) (replyOptions.RenewalTimeValue_T1);
                         leaseTime[2] = (byte) (replyOptions.RenewalTimeValue_T1 >> 8);
                         leaseTime[1] = (byte) (replyOptions.RenewalTimeValue_T1 >> 16);
                         leaseTime[0] = (byte) (replyOptions.RenewalTimeValue_T1 >> 24);
-                        options.Add(DHCPOption.RenewalTimeValue_T1, leaseTime);
+                        options[DHCPOption.RenewalTimeValue_T1] = leaseTime;
                     }
                     if (replyOptions.RebindingTimeValue_T2.HasValue)
                     {
@@ -203,7 +203,7 @@ namespace DotNetProjects.DhcpServer
                         leaseTime[2] = (byte) (replyOptions.RebindingTimeValue_T2 >> 8);
                         leaseTime[1] = (byte) (replyOptions.RebindingTimeValue_T2 >> 16);
                         leaseTime[0] = (byte) (replyOptions.RebindingTimeValue_T2 >> 24);
-                        options.Add(DHCPOption.RebindingTimeValue_T2, leaseTime);
+                        options[DHCPOption.RebindingTimeValue_T2]  = leaseTime;
                     }
                 }
             }
@@ -211,14 +211,15 @@ namespace DotNetProjects.DhcpServer
             if (otherForceOptions != null)
                 foreach (var option in otherForceOptions.Keys)
                 {
-                    options.Add(option, otherForceOptions[option]);
-                    if (option == DHCPOption.RelayInfo) relayInfo = null;
+                    options[option] = otherForceOptions[option];
+                    if (option == DHCPOption.RelayInfo)
+                        relayInfo = null;
                 }
 
             // Option 82? Send it back!
             if (relayInfo != null)
             {
-                options.Add(DHCPOption.RelayInfo, relayInfo);
+                options[DHCPOption.RelayInfo] = relayInfo;
             }
 
             foreach (var option in options.OrderBy(x=>(int)x.Key))
