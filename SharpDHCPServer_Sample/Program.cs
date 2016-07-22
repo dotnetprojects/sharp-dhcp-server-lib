@@ -21,8 +21,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Net;
+using System.Net.NetworkInformation;
 using DotNetProjects.DhcpServer;
 
 namespace Cluster.SharpDHCPServer_Sample
@@ -34,10 +36,12 @@ namespace Cluster.SharpDHCPServer_Sample
         static Dictionary<string, IPAddress> leases = new Dictionary<string, IPAddress>();
         static void Main(string[] args)
         {
-            var server = new DHCPServer();
+	        var eth0If = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(x => x.Name == "eth0");
+			var server = new DHCPServer();
             server.ServerName = "SharpDHCPServer";
             server.OnDataReceived += Request;
             server.BroadcastAddress = IPAddress.Parse("192.168.1.255");
+	        server.SendDhcpAnswerNetworkInterface = eth0If;
             server.Start();
             Console.WriteLine("Running DHCP server. Press enter to stop it.");
             Console.ReadLine();

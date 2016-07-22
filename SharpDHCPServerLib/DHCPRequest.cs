@@ -327,17 +327,25 @@ namespace DotNetProjects.DhcpServer
                 {
                     //requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                     //endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
-
+					
                     var udp = new UdpClient();
                     udp.EnableBroadcast = true;
-                    udp.Send(DataToSend, DataToSend.Length, new IPEndPoint(dhcpServer.BroadcastAddress, 68));
+	                if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
+	                {
+						udp.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
+					}
+					udp.Send(DataToSend, DataToSend.Length, new IPEndPoint(dhcpServer.BroadcastAddress, 68));
                     udp.Close();
                 }
                 else
                 {
                     requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
                     endPoint = new IPEndPoint(new IPAddress(replyBuffer.giaddr), PORT_TO_SEND_TO_RELAY);
-                    requestSocket.SendTo(DataToSend, endPoint);
+					if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
+					{
+						requestSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
+					}
+					requestSocket.SendTo(DataToSend, endPoint);
                 }
             }
         }

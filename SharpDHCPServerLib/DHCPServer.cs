@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -38,11 +39,13 @@ namespace DotNetProjects.DhcpServer
 
         public IPAddress BroadcastAddress { get; set; }
 
-        /// <summary>
-        /// Creates DHCP server, it will be started instantly
-        /// </summary>
-        /// <param name="bindIp">IP address to bind</param>
-        public DHCPServer(IPAddress bindIp)
+		public NetworkInterface SendDhcpAnswerNetworkInterface { get; set; }
+
+		/// <summary>
+		/// Creates DHCP server, it will be started instantly
+		/// </summary>
+		/// <param name="bindIp">IP address to bind</param>
+		public DHCPServer(IPAddress bindIp)
         {
             _bindIp = bindIp;
         }
