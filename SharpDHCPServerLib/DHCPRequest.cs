@@ -58,7 +58,6 @@ namespace DotNetProjects.DhcpServer
             public byte[] options;
         }
 
-        internal DHCPRequest(byte[] data, Socket socket, DHCPServer server)
         {
             dhcpServer = server;
             System.IO.BinaryReader rdr;
@@ -112,6 +111,9 @@ namespace DotNetProjects.DhcpServer
 
             if (reqList == null && forceOptions != null)
                 reqList = new DHCPOption[0];
+
+            if (forceOptions == null)
+                forceOptions = new DHCPOption[0];
 
             // Requested options
             if ((reqList != null) && (replyOptions != null))

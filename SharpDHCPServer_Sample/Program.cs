@@ -36,11 +36,13 @@ namespace Cluster.SharpDHCPServer_Sample
         static Dictionary<string, IPAddress> leases = new Dictionary<string, IPAddress>();
         static void Main(string[] args)
         {
-	        var eth0If = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(x => x.Name == "eth0");
-			var server = new DHCPServer();
+            var lst = NetworkInterface.GetAllNetworkInterfaces();
+
+            var eth0If = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(x => x.Name == "USB_ETH");
+			var server = new DHCPServer(IPAddress.Parse("192.168.1.80"));
             server.ServerName = "SharpDHCPServer";
             server.OnDataReceived += Request;
-            server.BroadcastAddress = IPAddress.Parse("192.168.1.255");
+            server.BroadcastAddress = IPAddress.Broadcast;
 	        server.SendDhcpAnswerNetworkInterface = eth0If;
             server.Start();
             Console.WriteLine("Running DHCP server. Press enter to stop it.");
