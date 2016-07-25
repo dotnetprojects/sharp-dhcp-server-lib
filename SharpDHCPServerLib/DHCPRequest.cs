@@ -58,6 +58,7 @@ namespace DotNetProjects.DhcpServer
             public byte[] options;
         }
 
+        internal DHCPRequest(byte[] data, Socket socket, DHCPServer server)
         {
             dhcpServer = server;
             System.IO.BinaryReader rdr;
