@@ -331,7 +331,7 @@ namespace DotNetProjects.DhcpServer
                     //requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                     //endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
 					
-                    var udp = new UdpClient();
+                    var udp = new UdpClient(67);
                     udp.EnableBroadcast = true;
 	                if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
 	                {
