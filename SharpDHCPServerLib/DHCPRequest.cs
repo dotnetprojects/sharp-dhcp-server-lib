@@ -186,27 +186,14 @@ namespace DotNetProjects.DhcpServer
                 // Lease time
                 if (replyOptions != null)
                 {
-                    var leaseTime = new byte[4];
-                    leaseTime[3] = (byte)(replyOptions.IPAddressLeaseTime);
-                    leaseTime[2] = (byte)(replyOptions.IPAddressLeaseTime >> 8);
-                    leaseTime[1] = (byte)(replyOptions.IPAddressLeaseTime >> 16);
-                    leaseTime[0] = (byte)(replyOptions.IPAddressLeaseTime >> 24);
-                    options[DHCPOption.IPAddressLeaseTime] = leaseTime;
+                    options[DHCPOption.IPAddressLeaseTime] = EncodeTimeOption(replyOptions.IPAddressLeaseTime);
                     if (replyOptions.RenewalTimeValue_T1.HasValue)
                     {
-                        leaseTime[3] = (byte) (replyOptions.RenewalTimeValue_T1);
-                        leaseTime[2] = (byte) (replyOptions.RenewalTimeValue_T1 >> 8);
-                        leaseTime[1] = (byte) (replyOptions.RenewalTimeValue_T1 >> 16);
-                        leaseTime[0] = (byte) (replyOptions.RenewalTimeValue_T1 >> 24);
-                        options[DHCPOption.RenewalTimeValue_T1] = leaseTime;
+                        options[DHCPOption.RenewalTimeValue_T1] = EncodeTimeOption(replyOptions.RenewalTimeValue_T1.Value);
                     }
                     if (replyOptions.RebindingTimeValue_T2.HasValue)
                     {
-                        leaseTime[3] = (byte) (replyOptions.RebindingTimeValue_T2);
-                        leaseTime[2] = (byte) (replyOptions.RebindingTimeValue_T2 >> 8);
-                        leaseTime[1] = (byte) (replyOptions.RebindingTimeValue_T2 >> 16);
-                        leaseTime[0] = (byte) (replyOptions.RebindingTimeValue_T2 >> 24);
-                        options[DHCPOption.RebindingTimeValue_T2]  = leaseTime;
+                        options[DHCPOption.RebindingTimeValue_T2] = EncodeTimeOption(replyOptions.RebindingTimeValue_T2.Value);
                     }
                 }
             }
@@ -234,6 +221,16 @@ namespace DotNetProjects.DhcpServer
             Array.Resize(ref resultOptions, resultOptions.Length + 1);
             Array.Copy(new byte[] { 255 }, 0, resultOptions, resultOptions.Length - 1, 1);
             return resultOptions;
+        }
+
+        private static byte[] EncodeTimeOption(uint seconds)
+        {
+            var leaseTime = new byte[4];
+            leaseTime[3] = (byte)seconds;
+            leaseTime[2] = (byte)(seconds >> 8);
+            leaseTime[1] = (byte)(seconds >> 16);
+            leaseTime[0] = (byte)(seconds >> 24);
+            return leaseTime;
         }
 
         static private void CreateOptionElement(ref byte[] options, DHCPOption option, byte[] data)
