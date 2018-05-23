@@ -325,27 +325,23 @@ namespace DotNetProjects.DhcpServer
                 if ((replyBuffer.giaddr[0] == 0) && (replyBuffer.giaddr[1] == 0) &&
                     (replyBuffer.giaddr[2] == 0) && (replyBuffer.giaddr[3] == 0))
                 {
-                    //requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-                    //endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
-					
-                    var udp = new UdpClient(67);
-                    udp.EnableBroadcast = true;
-	                if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
-	                {
-						udp.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
-					}
-					udp.Send(DataToSend, DataToSend.Length, new IPEndPoint(dhcpServer.BroadcastAddress, 68));
-                    udp.Close();
+                    requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+                    endPoint = new IPEndPoint(dhcpServer.BroadcastAddress, PORT_TO_SEND_TO_CLIENT);
+                    if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
+                    {
+                        requestSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
+                    }
+                    requestSocket.SendTo(DataToSend, endPoint);
                 }
                 else
                 {
                     requestSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, false);
                     endPoint = new IPEndPoint(new IPAddress(replyBuffer.giaddr), PORT_TO_SEND_TO_RELAY);
-					if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
-					{
-						requestSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
-					}
-					requestSocket.SendTo(DataToSend, endPoint);
+                    if (dhcpServer.SendDhcpAnswerNetworkInterface != null)
+                    {
+                        requestSocket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastInterface, (int)IPAddress.HostToNetworkOrder(dhcpServer.SendDhcpAnswerNetworkInterface.GetIPProperties().GetIPv4Properties().Index));
+                    }
+                    requestSocket.SendTo(DataToSend, endPoint);
                 }
             }
         }

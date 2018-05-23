@@ -39,7 +39,7 @@ namespace Cluster.SharpDHCPServer_Sample
             var lst = NetworkInterface.GetAllNetworkInterfaces();
 
             var eth0If = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(x => x.Name == "USB_ETH");
-			var server = new DHCPServer(IPAddress.Parse("192.168.1.80"));
+			var server = new DHCPServer();
             server.ServerName = "SharpDHCPServer";
             server.OnDataReceived += Request;
             server.BroadcastAddress = IPAddress.Broadcast;
