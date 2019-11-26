@@ -1,6 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup>
    <TargetFramework>netstandard2.0</TargetFramework>
+   <PackageId>DotNetProjects.DhcpServer</PackageId>
+   <Authors>DotNetProjects</Authors>
+   <Company>DotNetProjects</Company>
+   <Product>DotNetProjects.DhcpServer</Product>
+   <PackageProjectUrl>https://github.com/dotnetprojects/sharp-dhcp-server-lib</PackageProjectUrl>
+   <PackageLicenseExpression>MIT</PackageLicenseExpression>
+   <FileVersion>1.0.0.0</FileVersion>
+   <AssemblyVersion>1.0.0.0</AssemblyVersion>
+   <Description>a fully managed DhcpServer</Description>
+   <Copyright>2019</Copyright>
+   <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+   <AssemblyName>DotNetProjects.DhcpServer</AssemblyName>
+   <RootNamespace>DotNetProjects.DhcpServer</RootNamespace>
  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

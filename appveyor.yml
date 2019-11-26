@@ -1,17 +1,21 @@
-version: 1.0.{build}
+version: 2.0.{build}
 
 branches:
   only:
     - master
 
-assembly_info:
+dotnet_csproj:
   patch: true
-  file: AssemblyInfo.*
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}' 
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 
 configuration: Debug
+
+image: Visual Studio 2019
 
 before_build:
   - nuget restore
@@ -19,16 +23,9 @@ before_build:
 build:
   project: SharpDHCPServer.sln
 
-after_build:
-  - ps: .\nuget\pack.ps1
-
 test: off
 
 artifacts:
-  - path: SharpDHCPServerLib\bin\Debug\DotNetProjects.DhcpServer.dll
-    name: DotNetProjects.DhcpServer.dll
-  - path: SharpDHCPServerLib\bin\Debug\DotNetProjects.DhcpServer.pdb
-    name: DotNetProjects.DhcpServer.pdb
   - path: '**\DotNetProjects.DhcpServer*.nupkg'
   
 #uncomment to publish to NuGet
