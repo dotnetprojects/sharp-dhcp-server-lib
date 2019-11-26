@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
  <PropertyGroup>
-   <TargetFramework>netstandard2.0</TargetFramework>
+   <TargetFrameworks>netstandard2.0;net40</TargetFrameworks>
    <PackageId>DotNetProjects.DhcpServer</PackageId>
    <Authors>DotNetProjects</Authors>
    <Company>DotNetProjects</Company>
@@ -14,27 +14,9 @@
    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
    <AssemblyName>DotNetProjects.DhcpServer</AssemblyName>
    <RootNamespace>DotNetProjects.DhcpServer</RootNamespace>
+   <Version>1.0.0</Version>
  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\DotNetProjects.DhcpServer.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\DotNetProjects.DhcpServer.xml</DocumentationFile>
-  </PropertyGroup>
-
+ 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
