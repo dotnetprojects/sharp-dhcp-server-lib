@@ -1,15 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDHCPServerLib", "SharpDHCPServerLib\SharpDHCPServerLib.csproj", "{B7FCD134-E2B2-43A9-96C5-3DEDB5669F37}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpDHCPServerLib", "SharpDHCPServerLib\SharpDHCPServerLib.csproj", "{B7FCD134-E2B2-43A9-96C5-3DEDB5669F37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpDHCPServer_Sample", "SharpDHCPServer_Sample\SharpDHCPServer_Sample.csproj", "{E0A4A539-681E-45E1-84A8-C530BA129856}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -29,18 +27,27 @@ Global
 		{B7FCD134-E2B2-43A9-96C5-3DEDB5669F37}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B7FCD134-E2B2-43A9-96C5-3DEDB5669F37}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B7FCD134-E2B2-43A9-96C5-3DEDB5669F37}.Release|x86.ActiveCfg = Release|Any CPU
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|x86.ActiveCfg = Debug|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|x86.Build.0 = Debug|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Any CPU.ActiveCfg = Release|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Mixed Platforms.Build.0 = Release|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|x86.ActiveCfg = Release|x86
-		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|x86.Build.0 = Release|x86
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Debug|x86.Build.0 = Debug|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|x86.ActiveCfg = Release|Any CPU
+		{E0A4A539-681E-45E1-84A8-C530BA129856}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C1E1858F-6B92-4A3B-8BB3-4009D4243F67}
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
