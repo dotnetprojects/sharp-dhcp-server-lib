@@ -67,7 +67,7 @@ namespace DotNetProjects.DhcpServer
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(ipLocalEndPoint);
             _cancellationTokenSource = new CancellationTokenSource();
-            receiveDataTask = new Task(ReceiveDataThread, _cancellationTokenSource.Token);
+            receiveDataTask = new Task(ReceiveDataThread, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
             receiveDataTask.Start();
         }
 
@@ -101,8 +101,7 @@ namespace DotNetProjects.DhcpServer
                     if (len > 0)
                     {
                         Array.Resize(ref buffer, len);
-                        var dataReceivedThread = new Thread(DataReceived);
-                        dataReceivedThread.Start(buffer);
+                        Task.Factory.StartNew(() => DataReceived(buffer));
                     }
                 }
                 catch (Exception ex)
