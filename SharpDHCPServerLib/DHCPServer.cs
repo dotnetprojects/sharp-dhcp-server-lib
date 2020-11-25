@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DotNetProjects.DhcpServer
 {
@@ -31,9 +32,10 @@ namespace DotNetProjects.DhcpServer
         public string ServerName { get; set; }
 
         private Socket socket = null;
-        private Thread receiveDataThread = null;
+        private Task receiveDataTask = null;
         private const int PORT_TO_LISTEN_TO = 67;
         private IPAddress _bindIp;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public event Action<Exception> UnhandledException;
 
@@ -56,13 +58,17 @@ namespace DotNetProjects.DhcpServer
             BroadcastAddress = IPAddress.Broadcast;
         }
 
+        /// <summary>Starts the DHCP server.</summary>
+        /// <exception cref="SocketException">Invalid Socket or error while accessing the socket.</exception>
+        /// <exception cref="System.Security.SecurityException">No permission for requested operation.</exception>
         public void Start()
         {
             var ipLocalEndPoint = new IPEndPoint(_bindIp, PORT_TO_LISTEN_TO);
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(ipLocalEndPoint);
-            receiveDataThread = new Thread(ReceiveDataThread);
-            receiveDataThread.Start();
+            _cancellationTokenSource = new CancellationTokenSource();
+            receiveDataTask = new Task(ReceiveDataThread, _cancellationTokenSource.Token);
+            receiveDataTask.Start();
         }
 
         /// <summary>Disposes DHCP server</summary>
@@ -73,16 +79,19 @@ namespace DotNetProjects.DhcpServer
                 socket.Close();
                 socket = null;
             }
-            if (receiveDataThread != null)
+            if (receiveDataTask != null)
             {
-                receiveDataThread.Abort();
-                receiveDataThread = null;
+                _cancellationTokenSource.Cancel();
+                receiveDataTask.Wait();
+                receiveDataTask = null;
+                _cancellationTokenSource.Dispose();
+                _cancellationTokenSource = null;
             }
         }
 
         private void ReceiveDataThread()
         {
-            while (true)
+            while (!_cancellationTokenSource.IsCancellationRequested)
             {
                 try
                 {
